@@ -19,19 +19,19 @@ vagrant plugin install vagrant-vbguest
 To clone repository
 
 ```bash
-git clone https://github.com/faisalshah11/app-nomad-consul.git
-cd app-nomad-consul
+git clone https://github.com/faisalshah11/nomad-consul-jenkins.git
+cd nomad-consul-jenkins
 ```
 
 ---
 
 Provision infrastructure with following IP addresses:
 
-master-server   => 10.10.10.10
-worker-1        => 10.10.10.20
-worker-2        => 10.10.10.30
-fabio-lb        => 10.10.10.40 (optional)
-nginx           => 10.10.10.50
+master-server   => 10.10.10.10\
+worker-1        => 10.10.10.20\
+worker-2        => 10.10.10.30\
+fabio-lb        => 10.10.10.40 (optional)\
+nginx (proxy)   => 10.10.10.50\
 jenkins         => 10.10.10.60
 
 ```bash
@@ -41,7 +41,7 @@ vagrant up --provision
 
 Jenkins server is provisioned with jobs, you just need to signup on jenkins page (10.10.10.60:8080) and you will be able to deploy application from there.
 
-First run DEPLOY-AIRPORTv101-COUNTRYv101 job to deploy 101 version of both applications.
+First run **DEPLOY-AIRPORTv101-COUNTRYv101** job to deploy 101 version of both applications.
 
 Now when commit is made on airport repository, jenkins will update the airport service with 110 version.
 
