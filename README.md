@@ -1,6 +1,6 @@
 # nomad-consul-jenkins
 
-Vagrant file to create nomad and consul master, two nomad workers with consul clients, one nginx server for reverse proxy.
+Vagrantfile to create nomad and consul master, two nomad workers, one nginx server for reverse proxy and jenkins server for app deployments.
 
 Single node master (with nomad and consul) is used due to local env limitation, consul and nomad master should be separated with 3 node (minimum) cluster.
 
@@ -20,19 +20,19 @@ To clone repository
 
 ```bash
 git clone https://github.com/faisalshah11/nomad-consul-jenkins.git
-cd nomad-consul-jenkins
+cd nomad-consul-jenkins/nomad/
 ```
 
 ---
 
 Provision infrastructure with following IP addresses:
 
-master-server   => 10.10.10.10\
-worker-1        => 10.10.10.20\
-worker-2        => 10.10.10.30\
-fabio-lb        => 10.10.10.40 (optional)\
-nginx (proxy)   => 10.10.10.50\
-jenkins         => 10.10.10.60
+master-server   -> 10.10.10.10\
+worker-1        -> 10.10.10.20\
+worker-2        -> 10.10.10.30\
+fabio-lb        -> 10.10.10.40 (optional)\
+nginx (proxy)   -> 10.10.10.50\
+jenkins         -> 10.10.10.60
 
 ```bash
 vagrant up --provision 
@@ -47,7 +47,13 @@ Now when commit is made on airport repository, jenkins will update the airport s
 
 ---
 
-Check service health status on consul, following endpoints will become available after successful deployment,
+
+Nomad: 10.10.10.10:4646
+Consul: 10.10.10.10:8500
+Jenkins: 10.10.10.60:8080
+
+
+Following endpoints will become available after successful deployment,
 
 ```bash
 10.10.10.50:8000/airports

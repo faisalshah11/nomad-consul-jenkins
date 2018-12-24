@@ -1,0 +1,98 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.ssh.insert_key = false
+    config.vbguest.auto_update = true
+    config.ssh.forward_agent = true
+    config.vm.provider "virtualbox" do |vb|
+        vb.memory = 128
+        vb.cpus = 1
+        vb.linked_clone = true
+      end
+
+    config.vm.define "master-server" do |master_config|
+        master_config.vm.box = "bento/ubuntu-16.04"
+        master_config.vm.hostname = "master-server"
+        master_config.vm.network "private_network", ip: "10.10.10.10"
+        master_config.vm.network "forwarded_port", guest: 8500, host: "8500"
+        master_config.vm.network "forwarded_port", guest: 4646, host: "4646"
+        master_config.vm.network "private_network", type: "dhcp"
+        master_config.vm.provision "shell", path: "bootstrap/master.sh"
+        config.vm.provision "file", source: "jobs", destination: "/home/vagrant/jobs"
+
+        master_config.vm.provider "virtualbox" do |vb|
+            vb.name = "master-server"
+            vb.memory = 256
+        end 
+    end
+
+    config.vm.define "worker-1" do |worker_config|
+        worker_config.vm.box = "bento/ubuntu-16.04"
+        worker_config.vm.hostname = "worker-1"
+        worker_config.vm.network "private_network", ip: "10.10.10.20" 
+        worker_config.vm.network "private_network", type: "dhcp"
+        worker_config.vm.provision "docker"
+        worker_config.vm.provision "shell", path: "bootstrap/worker-1.sh"
+        worker_config.vm.provider "virtualbox" do |vb|
+            vb.name = "worker-1"
+            vb.memory = 512
+            vb.cpus = 2
+        end 
+    end
+
+    config.vm.define "worker-2" do |worker_config|
+        worker_config.vm.box = "bento/ubuntu-16.04"
+        worker_config.vm.hostname = "worker-2"
+        worker_config.vm.network "private_network", ip: "10.10.10.30" 
+        worker_config.vm.network "private_network", type: "dhcp"
+        worker_config.vm.provision "docker"
+        worker_config.vm.provision "shell", path: "bootstrap/worker-2.sh"
+        worker_config.vm.provider "virtualbox" do |vb|
+            vb.name = "worker-2"
+            vb.memory = 1024
+            vb.cpus = 4
+        end 
+    end
+
+    config.vm.define "fabio" do |fabio_config|
+        fabio_config.vm.box = "bento/ubuntu-16.04"
+        fabio_config.vm.hostname = "fabio-lb"
+        fabio_config.vm.network "private_network", ip: "10.10.10.40" 
+        fabio_config.vm.network "private_network", type: "dhcp"
+        fabio_config.vm.provision "docker"
+        fabio_config.vm.provision "shell", path: "bootstrap/fabio-lb.sh"
+        fabio_config.vm.provider "virtualbox" do |vb|
+            vb.name = "fabio-lb"
+            vb.memory = 256
+            vb.cpus = 1
+        end 
+    end
+
+    config.vm.define "jenkins" do |jenkins_config|
+        jenkins_config.vm.box = "bento/ubuntu-16.04"
+        jenkins_config.vm.hostname = "jenkins"
+        jenkins_config.vm.network "private_network", ip: "10.10.10.60" 
+        jenkins_config.vm.network "private_network", type: "dhcp"
+        jenkins_config.vm.provision "docker"
+        jenkins_config.vm.provision "shell", path: "bootstrap/jenkins.sh"
+        jenkins_config.vm.provider "virtualbox" do |vb|
+            vb.name = "jenkins"
+            vb.memory = 512
+        end 
+    end
+
+    config.vm.define "nginx" do |nginx_config|
+        nginx_config.vm.box = "bento/ubuntu-16.04"
+        nginx_config.vm.hostname = "nginx"
+        nginx_config.vm.network "private_network", ip: "10.10.10.50" 
+        nginx_config.vm.network "private_network", type: "dhcp"
+        nginx_config.vm.provision "shell", path: "bootstrap/nginx.sh"
+        nginx_config.vm.provider "virtualbox" do |vb|
+            vb.name = "nginx"
+            vb.cpus = 2
+            vb.memory = 256
+        end 
+    end
+
+end
