@@ -7,7 +7,65 @@ echo -e "domain node.consul\nsearch node.consul service.consul\nnameserver 10.10
 
 rm -f /var/www/html/* /etc/nginx/sites-enabled/*
 
+mkdir /tmp/unpack
+consul_datadir=/var/consul
 
+export DEBIAN_FRONTEND=noninteractive
+
+mkdir -p $consul_datadir
+
+apt-get update -y && apt-get install jq htop wget curl unzip -y
+
+
+cd /tmp/unpack
+curl -O https://releases.hashicorp.com/consul/1.4.0/consul_1.4.0_linux_amd64.zip
+unzip consul*.zip
+mv consul /usr/local/bin/
+cd -
+
+cat > /etc/consul.json <<-EOF
+
+{
+  "autopilot": {
+    "cleanup_dead_servers": true
+  },
+  "acl_master_token":"7b1e3d26-328d-40ed-8432-946a1affd5b7",
+  "acl_token": "anonymous",
+  "advertise_addr":  "10.10.10.50",
+  "advertise_addr_wan": "10.10.10.50",
+  "bind_addr": "0.0.0.0",
+  "client_addr": "0.0.0.0",
+  "data_dir": "/var/consul",
+  "datacenter": "dc1",
+  "encrypt": "2KVIYVZRMc3DM9XZQUd10A==",
+  "node_name": "nginx",
+  "ports": {
+"dns": 53
+  },
+  "raft_protocol": 3,
+  "dns_config": [ {"enable_truncate": true} ],
+  "recursors": ["8.8.8.8","10.10.10.50"],
+  "retry_join": ["10.10.10.10"]
+}
+EOF
+
+cat > /etc/systemd/system/consul.service <<-EOF
+	[Unit]
+	Description=consul agent
+	Requires=network-online.target
+	After=network-online.target
+	[Service]
+	Restart=on-failure
+	ExecStart=/usr/local/bin/consul agent -config-file=/etc/consul.json
+	ExecReload=/bin/kill -HUP \$MAINPID
+	KillSignal=SIGINT
+	[Install]
+	WantedBy=multi-user.target
+EOF
+chmod +x /usr/local/bin/consul 
+mkdir -p "/var/lib/consul" 
+systemctl enable consul.service
+systemctl start consul.service
 
 
 
