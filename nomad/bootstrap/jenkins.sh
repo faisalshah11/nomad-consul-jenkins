@@ -5,7 +5,7 @@ mkdir /var/lib/jenkins	/tmp/jenkins
 useradd -U -r -s /sbin/nologin jenkins
 curl -s -L http://ftp-chi.osuosl.org/pub/jenkins/war/2.156/jenkins.war > /usr/lib/jenkins.war
 
-curl -o /tmp/jenkins.tar.gz -L https://www.dropbox.com/s/e7lnjg6jr0v5n2n/jenkins.tar.gz?dl=0
+curl -o /tmp/jenkins.tar.gz -L https://s3-eu-west-1.amazonaws.com/jenkins-lt/jenkins.tar.gz
 
 tar -xzf /tmp/jenkins.tar.gz -C /var/lib/jenkins
 
